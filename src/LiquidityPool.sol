@@ -21,4 +21,18 @@ contract LiquidityPool {
         reserveA += amountA;
         reserveB += amountB;
     }
+
+    function removeLiquidity(uint256 amountA, uint256 amountB) external {
+        require(reserveA >= amountA && reserveB >= amountB, "Insufficient reserves");
+
+        reserveA -= amountA;
+        reserveB -= amountB;
+
+        tokenA.transfer(msg.sender, amountA);
+        tokenA.transfer(msg.sender, amountB);
+    }
+
+    function getReserves() external view returns (uint256, uint256) {
+        return (reserveA, reserveB);
+    }
 }
