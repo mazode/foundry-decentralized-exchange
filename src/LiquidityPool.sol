@@ -13,4 +13,12 @@ contract LiquidityPool {
         tokenA = IERC20(_tokenA);
         tokenB = IERC20(_tokenB);
     }
+
+    function addLiquidity(uint256 amountA, uint256 amountB) external {
+        tokenA.transferFrom(msg.sender, address(this), amountA);
+        tokenA.transferFrom(msg.sender, address(this), amountB);
+
+        reserveA += amountA;
+        reserveB += amountB;
+    }
 }
