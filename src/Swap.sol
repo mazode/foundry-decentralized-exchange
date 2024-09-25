@@ -14,4 +14,19 @@ contract Swap {
         tokenA = IERC20(liquidityPool.tokenA());
         tokenB = IERC20(liquidityPool.tokenB());
     }
+
+    function swapAtoB(uint256 amountAIn) external {
+        (uint256 reserveA, uint256 reserveB) = liquidityPool.getReserves();
+        require(reserveA > 0 && reserveB > 0, "Invalid reserves");
+
+        uint256 amountAInWithFee = amountAIn * 997 / 1000; // 0.3 %
+        uint256 amountBOut = reserveB * amountAInWithFee / (reserveA + amountAInWithFee);
+
+        require(amountBOut > 0, "Insufficient output");
+
+        tokenA.transferFrom(msg.sender, address(liquidityPool), amountAIn);
+        tokenB.transfer(msg.sender, amountBOut);
+
+        liquidityPool.addLiquidity(amountAIn, amountBOut); // Update the liquidity
+    }
 }
