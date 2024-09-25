@@ -29,4 +29,19 @@ contract Swap {
 
         liquidityPool.addLiquidity(amountAIn, amountBOut); // Update the liquidity
     }
+
+    function swapBToA(uint256 amountBIn) external {
+        (uint256 reserveA, uint256 reserveB) = liquidityPool.getReserves();
+        require(reserveA > 0 && reserveB > 0, "Invalid reserves");
+
+        uint256 amountBInWithFee = amountBIn * 997 / 1000; // 0.3% fee
+        uint256 amountAOut = reserveA * amountBInWithFee / (reserveB + amountBInWithFee);
+
+        require(amountAOut > 0, "Insufficient out");
+
+        tokenB.transferFrom(msg.sender, address(liquidityPool), amountBIn);
+        tokenA.transfer(msg.sender, amountAOut);
+
+        liquidityPool.addLiquidity(amountAOut, amountBIn); // Update the liqduitiy
+    }
 }
