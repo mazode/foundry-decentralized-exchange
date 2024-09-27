@@ -40,4 +40,18 @@ contract LiquidityPoolTest is Test {
         tokenA.approve(address(liquidityPool), 1000 ether);
         tokenB.approve(address(liquidityPool), 1000 ether);
     }
+
+    function testAddLiquidity() public {
+        uint256 amountA = 100 ether;
+        uint256 amountB = 100 ether;
+
+        // Add liquidity to the Pool
+        vm.prank(liquidityProvider);
+        liquidityPool.addLiquidity(amountA, amountB);
+
+        // Check reserves and liquidity
+        assertEq(liquidityPool.reserveA(), amountA);
+        assertEq(liquidityPool.reserveB(), amountB);
+        assertEq(liquidityPool.liquidity(liquidityProvider), amountA + amountB);
+    }
 }
