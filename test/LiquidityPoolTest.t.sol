@@ -54,4 +54,23 @@ contract LiquidityPoolTest is Test {
         assertEq(liquidityPool.reserveB(), amountB);
         assertEq(liquidityPool.liquidity(liquidityProvider), amountA + amountB);
     }
+
+    function testRemoveLiquidity() public {
+        uint256 amountA = 100 ether;
+        uint256 amountB = 100 ether;
+
+        // Add liquidity first
+        vm.prank(liquidityProvider);
+        liquidityPool.addLiquidity(amountA, amountB);
+
+        // Remove liquidity
+        uint256 liquidityAmount = amountA + amountB;
+        vm.prank(liquidityProvider);
+        liquidityPool.removeLiquidity(liquidityAmount);
+
+        // Check reserves and liquidity
+        assertEq(liquidityPool.reserveA(), 0);
+        assertEq(liquidityPool.reserveB(), 0);
+        assertEq(liquidityPool.liquidity(liquidityProvider), 0);
+    }
 }
