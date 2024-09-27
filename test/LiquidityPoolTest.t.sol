@@ -3,16 +3,41 @@ pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
 import "../src/LiquidityPool.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+
+// Mock ERC20 token for testing
+contract MockERC20 is ERC20 {
+    constructor(string memory name, string memory symbol) ERC20(name, symbol) {}
+
+    function mint(address to, uint256 amount) public {
+        _mint(to, amount);
+    }
+}
 
 contract LiquidityPoolTest is Test {
-    LiquidityPool pool;
-    IERC20 tokenA;
-    IERC20 tokenB;\
+    LiquidityPool liquidityPool;
+    MockERC20 tokenA;
+    MockERC20 tokenB;
+    address liquidityProvider;
 
     function setUp() public {
-        tokenA = IERC20(deployMockERC20("TokenA", "TKA", 18));
-        tokenB = IERC20(deployMockERC20("TokenB", "TKB", 18));
-        pool = new LiquidityPool(address(tokenA), address(tokenB));
+        // Deploy mock tokens
+        tokenA = new MockERC20("Token A", "TKA");
+        tokenB = new MockERC20("Token B", "TKB");
+
+        // Deploy LiquidityPool contract
+        liquidityPool = new LiquidityPool(address(tokenA), address(tokenB));
+
+        // Create a user who will provide liquidity
+        liquidityProvider = address(0x1234);
+
+        // Mint tokens for the liquidity provider
+        tokenA.mint(liquidityProvider, 1000 ether);
+        tokenB.mint(liquidityProvider, 1000 ether);
+
+        // Approve liquidity pool contract to transfer tokens
+        vm.prank(liquidityProvider);
+        tokenA.approve(address(liquidityPool), 1000 ether);
+        tokenB.approve(address(liquidityPool), 1000 ether);
     }
-    
 }
