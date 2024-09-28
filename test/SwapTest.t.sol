@@ -44,4 +44,17 @@ contract TokenSwapTest is Test {
         tokenA.approve(address(tokenSwap), 100 ether);
         tokenB.approve(address(tokenSwap), 100 ether);
     }
+
+    function testTokenSwap() public {
+        uint256 amountIn = 10 ether;
+
+        // Perform token swap
+        vm.prank(swapper);
+        uint256 amountOut = tokenSwap.swap(address(tokenA), amountIn);
+
+        // Check if swap worked as expected
+        assertGt(amountOut, 0, "Amount out should be greater than zero");
+        assertEq(tokenA.balanceOf(swapper), 90 ether); // 100 - 10
+        assertEq(tokenB.balanceOf(swapper), 100 ether + amountOut);
+    }
 }
