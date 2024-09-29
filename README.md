@@ -1,66 +1,26 @@
-## Foundry
+# Token Swap and Liquidity Pool
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+## Overview
 
-Foundry consists of:
+This project demonstrates a simple decentralized token swap and liquidity pool system implemented in Solidity. It allows users to swap tokens based on the reserves in the pool using an automated market-making (AMM) algorithm. Additionally, the project includes functionality for users to add and remove liquidity to the pool.
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+## Features
 
-## Documentation
+- **Token Swap:** Allows users to swap between two ERC20 tokens, using the reserves in the pool to determine the exchange rate.
+- **Liquidity Management:** Users can add or remove liquidity from the pool, adjusting the token reserves.
+- **Automated Market Making (AMM):** The contract adjusts the price dynamically based on the available token reserves.
 
-https://book.getfoundry.sh/
+## Project Structure
 
-## Usage
+### Contracts
 
-### Build
+- **LiquidityPool.sol**: Handles adding/removing liquidity to the pool and tracks token reserves.
+- **Swap.sol**: Facilitates token swaps based on the liquidity pool reserves using AMM principles.
+- **MockERC20.sol**: A mock ERC20 token for testing purposes.
 
-```shell
-$ forge build
-```
+### Tests
 
-### Test
+The project uses [Foundry](https://book.getfoundry.sh/) for testing the smart contracts. Test files are included to verify the functionality of token swaps and liquidity management:
 
-```shell
-$ forge test
-```
-
-### Format
-
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+- `LiquidityPoolTest.t.sol`: Contains unit tests for adding/removing liquidity.
+- `SwapTest.t.sol`: Contains unit tests for swapping tokens using the liquidity pool.
