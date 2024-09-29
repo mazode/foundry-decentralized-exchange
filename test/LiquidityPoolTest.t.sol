@@ -35,24 +35,30 @@ contract LiquidityPoolTest is Test {
         tokenA.mint(liquidityProvider, 1000 ether);
         tokenB.mint(liquidityProvider, 1000 ether);
 
-        // Approve liquidity pool contract to transfer tokens
-        vm.prank(liquidityProvider);
+        // Approve liquidity pool contract to transfer tokens on behalf of liquidity provider
+        vm.startPrank(liquidityProvider); // Start impersonating liquidity provider
         tokenA.approve(address(liquidityPool), 1000 ether);
         tokenB.approve(address(liquidityPool), 1000 ether);
+        vm.stopPrank();
     }
 
     function testAddLiquidity() public {
         uint256 amountA = 100 ether;
         uint256 amountB = 100 ether;
 
-        // Add liquidity to the Pool
-        vm.prank(liquidityProvider);
+        // Add liquidity to the pool
+        vm.startPrank(liquidityProvider); // Impersonate liquidity provider
         liquidityPool.addLiquidity(amountA, amountB);
+        vm.stopPrank();
 
-        // Check reserves and liquidity
-        assertEq(liquidityPool.reserveA(), amountA);
-        assertEq(liquidityPool.reserveB(), amountB);
-        assertEq(liquidityPool.liquidity(liquidityProvider), amountA + amountB);
+        // Check token balances in the liquidity pool
+        assertEq(tokenA.balanceOf(address(liquidityPool)), amountA, "Token A reserve mismatch");
+        assertEq(tokenB.balanceOf(address(liquidityPool)), amountB, "Token B reserve mismatch");
+
+        // Check reserves and liquidity amount
+        assertEq(liquidityPool.reserveA(), amountA, "Reserve A mismatch");
+        assertEq(liquidityPool.reserveB(), amountB, "Reserve B mismatch");
+        assertEq(liquidityPool.liquidity(liquidityProvider), amountA + amountB, "Liquidity mismatch");
     }
 
     function testRemoveLiquidity() public {
@@ -60,17 +66,24 @@ contract LiquidityPoolTest is Test {
         uint256 amountB = 100 ether;
 
         // Add liquidity first
-        vm.prank(liquidityProvider);
+        vm.startPrank(liquidityProvider);
         liquidityPool.addLiquidity(amountA, amountB);
+        vm.stopPrank();
+
+        uint256 liquidityAmount = liquidityPool.liquidity(liquidityProvider);
 
         // Remove liquidity
-        uint256 liquidityAmount = amountA + amountB;
-        vm.prank(liquidityProvider);
+        vm.startPrank(liquidityProvider);
         liquidityPool.removeLiquidity(liquidityAmount);
+        vm.stopPrank();
 
-        // Check reserves and liquidity
-        assertEq(liquidityPool.reserveA(), 0);
-        assertEq(liquidityPool.reserveB(), 0);
-        assertEq(liquidityPool.liquidity(liquidityProvider), 0);
+        // Check token balances after removal
+        assertEq(tokenA.balanceOf(address(liquidityPool)), 0, "Token A reserve not cleared");
+        assertEq(tokenB.balanceOf(address(liquidityPool)), 0, "Token B reserve not cleared");
+
+        // Check reserves and liquidity after removal
+        assertEq(liquidityPool.reserveA(), 0, "Reserve A not cleared");
+        assertEq(liquidityPool.reserveB(), 0, "Reserve B not cleared");
+        assertEq(liquidityPool.liquidity(liquidityProvider), 0, "Liquidity not cleared");
     }
 }

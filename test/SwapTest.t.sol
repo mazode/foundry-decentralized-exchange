@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
-import "../src/TokenSwap.sol";
+import "../src/Swap.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 // Mock ERC20 token for testing
@@ -25,8 +25,8 @@ contract TokenSwapTest is Test {
         tokenA = new MockERC20("Token A", "TKA");
         tokenB = new MockERC20("Token B", "TKB");
 
-        // Set initial reserves
-        uint256 reserveA = 1000 ether;
+        // Initial reserves for the token swap
+        uint256 reserveA = 500 ether;
         uint256 reserveB = 1000 ether;
 
         // Deploy TokenSwap contract
@@ -37,12 +37,14 @@ contract TokenSwapTest is Test {
 
         // Mint tokens for the swapper
         tokenA.mint(swapper, 100 ether);
-        tokenB.mint(swapper, 100 ether);
+        tokenB.mint(swapper, 100 ether); // Added initial balance of Token B
+        tokenB.mint(address(tokenSwap), 1000 ether); // Ensure the pool has tokenB
 
-        // Approve TokenSwap contract to transfer tokens
-        vm.prank(swapper);
+        // Approve tokenSwap contract to transfer tokens
+        vm.startPrank(swapper);
         tokenA.approve(address(tokenSwap), 100 ether);
-        tokenB.approve(address(tokenSwap), 100 ether);
+        tokenB.approve(address(tokenSwap), 100 ether); // Added approval for Token B
+        vm.stopPrank();
     }
 
     function testTokenSwap() public {
